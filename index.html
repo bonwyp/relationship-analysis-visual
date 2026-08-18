@@ -3,491 +3,204 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>我和小李｜关系结构可视化</title>
-  <meta name="description" content="基于 WeFlow 私聊全量数据的中立双边关系结构可视化。">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <meta name="description" content="BON 与 Suizii 的 WeFlow 私聊关系可视化分析">
+  <title>BON / Suizii — 关系可视化分析</title>
   <style>
     :root {
-      --paper: #ffffff;
-      --ink: #000437;
-      --charcoal: #4b4b4b;
-      --gray: #777777;
-      --faded: #afafaf;
-      --green: #58cc02;
-      --soft-green: #d7ffb8;
-      --leaf: #a5ed6e;
-      --blue: #1cb0f6;
-      --blue-soft: #d9f3ff;
-      --yellow: #ffc800;
-      --orange: #ff9600;
-      --red: #ff4b4b;
-      --line: #d8d8d8;
-      --radius: 12px;
-      --font-body: "Nunito", "PingFang SC", "Microsoft YaHei", sans-serif;
-      --font-display: "Nunito", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --ink:#151515; --ink-soft:#3b3a35; --muted:#77746b; --line:#c7c4ba;
+      --paper:#eeece5; --paper-deep:#dfdcd2; --acid:#d7ff55; --lav:#c9c2ff;
+      --salmon:#ffb9aa; --mint:#a9dfca; --white:#faf9f5;
+      --mono:"SFMono-Regular","Roboto Mono",Consolas,monospace;
+      --sans:"Helvetica Neue","PingFang SC","Hiragino Sans GB",Arial,sans-serif;
     }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      color: var(--charcoal);
-      background: var(--paper);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.55;
-    }
-    a { color: var(--blue); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-    button { font: inherit; }
-    button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
-    .page { width: min(1200px, calc(100% - 40px)); margin: 0 auto; }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      min-height: 72px;
-      border-bottom: 2px solid var(--ink);
-    }
-    .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 800; }
-    .brand-mark {
-      width: 38px; height: 38px; border: 3px solid var(--ink); border-radius: 50%;
-      display: grid; place-items: center; font-weight: 800; font-size: 18px;
-    }
-    .topnav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-    .topnav a {
-      color: var(--ink); font-size: 13px; font-weight: 800; letter-spacing: .05em;
-      text-transform: uppercase; text-decoration: none; padding: 8px 12px; border-radius: 12px;
-    }
-    .topnav a:hover { color: var(--green); }
-
-    .hero { padding: 76px 0 54px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 64px; align-items: end; }
-    .eyebrow { color: var(--green); font-size: 14px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    h1, h2, h3 { margin: 0; color: var(--ink); font-family: var(--font-display); font-weight: 800; letter-spacing: -.025em; }
-    h1 { margin-top: 12px; font-size: clamp(42px, 7vw, 76px); line-height: 1.05; }
-    h1 .green { color: var(--green); }
-    h1 .blue { color: var(--blue); }
-    h2 { font-size: clamp(27px, 4vw, 42px); line-height: 1.12; }
-    h3 { font-size: 20px; line-height: 1.2; }
-    .hero-copy { max-width: 720px; font-size: 19px; line-height: 1.6; color: var(--gray); }
-    .hero-copy strong { color: var(--charcoal); }
-    .hero-note { align-self: stretch; display: flex; align-items: end; }
-    .sticker {
-      width: 100%; padding: 24px; border: 2px solid var(--ink); border-radius: var(--radius);
-      background: var(--soft-green); color: var(--ink); position: relative;
-    }
-    .sticker::after {
-      content: "↗"; position: absolute; top: 15px; right: 20px; font-size: 30px; font-weight: 800; color: var(--green);
-    }
-    .sticker-label { color: var(--green); font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    .sticker p { margin: 12px 0 0; font-size: 22px; line-height: 1.3; font-weight: 800; }
-    .source-line { margin-top: 18px; color: var(--gray); font-size: 13px; }
-
-    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 72px; }
-    .metric {
-      min-height: 132px; padding: 18px 18px 16px; border: 2px solid var(--ink); border-radius: var(--radius);
-      background: var(--paper);
-    }
-    .metric:nth-child(2) { background: var(--blue-soft); }
-    .metric:nth-child(3) { background: var(--soft-green); }
-    .metric:nth-child(4) { background: #fff6cc; }
-    .metric-label { color: var(--gray); font-size: 13px; font-weight: 700; }
-    .metric-value { margin-top: 4px; color: var(--ink); font-size: 34px; line-height: 1.05; font-weight: 800; }
-    .metric-note { margin-top: 8px; color: var(--charcoal); font-size: 12px; line-height: 1.35; }
-
-    .section { padding: 64px 0; border-top: 2px solid var(--ink); }
-    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
-    .section-head p { max-width: 520px; margin: 0; color: var(--gray); }
-    .section-kicker { margin-bottom: 8px; color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    .subtle { color: var(--gray); font-size: 13px; }
-
-    .stage-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-    .stage-tab {
-      border: 2px solid var(--ink); border-radius: 12px; padding: 9px 13px; color: var(--ink); background: var(--paper);
-      cursor: pointer; font-size: 13px; font-weight: 800;
-    }
-    .stage-tab[aria-pressed="true"] { background: var(--green); }
-    .stage-tab:hover { background: var(--leaf); }
-    .stage-detail { min-height: 48px; margin-bottom: 18px; color: var(--charcoal); }
-    .stage-detail strong { color: var(--ink); }
-
-    .timeline {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: end;
-      padding: 22px 0 0; border-bottom: 2px solid var(--ink);
-    }
-    .phase { min-width: 0; }
-    .phase-bar-wrap { height: 220px; display: flex; align-items: end; border-bottom: 1px solid var(--line); }
-    .phase-bar { width: 100%; min-height: 12px; background: var(--green); border: 2px solid var(--ink); border-bottom: 0; border-radius: 12px 12px 0 0; position: relative; }
-    .phase-bar::after { content: ""; position: absolute; left: 16%; right: 16%; bottom: 10px; height: 4px; border-radius: 4px; background: var(--ink); opacity: .28; }
-    .phase:nth-child(2) .phase-bar { background: var(--blue); }
-    .phase:nth-child(3) .phase-bar { background: var(--leaf); }
-    .phase:nth-child(4) .phase-bar { background: var(--yellow); }
-    .phase-value { margin-top: 10px; color: var(--ink); font-size: 20px; font-weight: 800; }
-    .phase-label { margin-top: 2px; color: var(--charcoal); font-size: 13px; font-weight: 800; }
-    .phase-meta { margin-top: 4px; color: var(--gray); font-size: 12px; }
-
-    .chart-frame { margin-top: 34px; padding: 18px 0 0; }
-    .chart-title { color: var(--ink); font-size: 15px; font-weight: 800; }
-    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; color: var(--gray); font-size: 12px; }
-    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
-    .legend-swatch { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); display: inline-block; }
-    .legend-swatch.green { background: var(--green); }
-    .legend-swatch.blue { background: var(--blue); }
-    svg { display: block; width: 100%; height: auto; overflow: visible; }
-    .chart-gridline { stroke: var(--line); stroke-width: 1; }
-    .chart-axis { stroke: var(--ink); stroke-width: 2; }
-    .chart-label { fill: var(--gray); font-size: 12px; font-weight: 700; }
-    .chart-line { fill: none; stroke: var(--green); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
-    .chart-line.secondary { stroke: var(--blue); stroke-width: 4; stroke-dasharray: 8 8; }
-    .chart-dot { fill: var(--paper); stroke: var(--green); stroke-width: 4; }
-    .chart-dot.secondary { stroke: var(--blue); }
-    .chart-value { fill: var(--ink); font-size: 12px; font-weight: 800; }
-
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
-    .split + .split { margin-top: 48px; }
-    .block-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
-    .block-title h3 { color: var(--ink); }
-    .balance-row { margin: 20px 0; }
-    .balance-head { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 800; }
-    .balance-head span:last-child { color: var(--gray); font-weight: 500; }
-    .dual-bars { display: grid; gap: 6px; margin-top: 8px; }
-    .bar-line { display: grid; grid-template-columns: 54px 1fr 42px; align-items: center; gap: 8px; font-size: 11px; color: var(--gray); }
-    .bar-track { height: 12px; background: #f0f0f0; border-radius: 12px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 12px; }
-    .bar-fill.user { background: var(--green); }
-    .bar-fill.peer { background: var(--blue); }
-    .bar-number { color: var(--ink); text-align: right; font-weight: 800; }
-    .callout {
-      margin-top: 24px; padding: 18px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--blue-soft);
-      color: var(--ink); font-weight: 700;
-    }
-    .callout.green { background: var(--soft-green); }
-
-    .invite-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .invite-table th, .invite-table td { padding: 12px 8px; border-bottom: 1px solid var(--line); text-align: left; }
-    .invite-table th { color: var(--gray); font-size: 12px; font-weight: 800; }
-    .invite-table td:not(:first-child), .invite-table th:not(:first-child) { text-align: right; }
-    .invite-table td strong { color: var(--ink); }
-    .rate { color: var(--ink); font-weight: 800; }
-    .rate.user { color: var(--green); }
-    .rate.peer { color: var(--blue); }
-
-    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: stretch; }
-    .flow-step { position: relative; min-height: 150px; padding: 18px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--paper); }
-    .flow-step:nth-child(1) { background: var(--soft-green); }
-    .flow-step:nth-child(2) { background: var(--blue-soft); }
-    .flow-step:nth-child(3) { background: #fff6cc; }
-    .flow-step:nth-child(4) { background: #f2f2f2; }
-    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -22px; top: 50%; transform: translateY(-50%); z-index: 2; color: var(--ink); font-size: 24px; font-weight: 800; }
-    .flow-num { width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); color: var(--ink); font-weight: 800; }
-    .flow-step h3 { margin-top: 16px; font-size: 17px; }
-    .flow-step p { margin: 8px 0 0; color: var(--charcoal); font-size: 13px; line-height: 1.45; }
-
-    .repair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: center; }
-    .repair-visual { display: grid; gap: 13px; }
-    .repair-row { display: grid; grid-template-columns: 98px 1fr 30px; gap: 12px; align-items: center; font-size: 13px; }
-    .repair-track { height: 20px; background: #f0f0f0; border-radius: 12px; overflow: hidden; }
-    .repair-fill { height: 100%; border-radius: 12px; background: var(--green); }
-    .repair-row:nth-child(2) .repair-fill { background: var(--blue); }
-    .repair-row:nth-child(3) .repair-fill { background: var(--yellow); }
-    .repair-row:nth-child(4) .repair-fill { background: var(--orange); }
-    .repair-row:nth-child(5) .repair-fill { background: var(--red); }
-    .repair-num { text-align: right; color: var(--ink); font-weight: 800; }
-    .repair-note { padding: 24px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--ink); color: var(--paper); }
-    .repair-note h3 { color: var(--green); }
-    .repair-note p { margin: 12px 0 0; color: #eef1ff; }
-
-    .path-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .path { min-height: 188px; padding: 18px; border: 2px solid var(--ink); border-radius: var(--radius); }
-    .path:nth-child(1) { background: var(--soft-green); }
-    .path:nth-child(2) { background: var(--blue-soft); }
-    .path:nth-child(3) { background: #fff6cc; }
-    .path:nth-child(4) { background: #f2f2f2; }
-    .path-number { color: var(--green); font-size: 14px; font-weight: 800; }
-    .path h3 { margin-top: 8px; font-size: 18px; }
-    .path p { margin: 10px 0 0; color: var(--charcoal); font-size: 13px; line-height: 1.45; }
-
-    .method { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; align-items: start; }
-    .method p { margin: 0; color: var(--gray); }
-    .method-list { margin: 0; padding: 0; list-style: none; }
-    .method-list li { padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--gray); font-size: 13px; }
-    .method-list strong { color: var(--ink); }
-    .footer { padding: 30px 0 54px; color: var(--gray); font-size: 12px; }
-
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 54px; }
-      .hero-note { max-width: 560px; }
-      .metric-grid { grid-template-columns: repeat(2, 1fr); }
-      .split, .repair-grid, .method { grid-template-columns: 1fr; gap: 28px; }
-      .path-grid { grid-template-columns: repeat(2, 1fr); }
-      .flow { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-      .flow-step:not(:last-child)::after { display: none; }
-    }
-    @media (max-width: 560px) {
-      .page { width: min(100% - 24px, 1200px); }
-      .topbar { align-items: flex-start; padding: 14px 0; flex-direction: column; }
-      .topnav { justify-content: flex-start; }
-      .hero { padding: 42px 0 38px; }
-      h1 { font-size: 46px; }
-      .hero-copy { font-size: 17px; }
-      .metric-grid, .path-grid, .flow { grid-template-columns: 1fr; }
-      .section { padding: 46px 0; }
-      .section-head { display: block; }
-      .section-head p { margin-top: 14px; }
-      .timeline { gap: 8px; }
-      .phase-bar-wrap { height: 150px; }
-      .phase-value { font-size: 15px; }
-      .phase-label { font-size: 11px; line-height: 1.25; }
-      .phase-meta { font-size: 10px; }
-      .invite-table { font-size: 12px; }
-      .invite-table th, .invite-table td { padding: 10px 4px; }
-      .bar-line { grid-template-columns: 48px 1fr 36px; }
-      .repair-row { grid-template-columns: 86px 1fr 28px; gap: 8px; font-size: 12px; }
-    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5}
+    a{color:inherit}
+    button{font:inherit}
+    .site-header{position:sticky;top:0;z-index:20;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;text-decoration:none}
+    .brand-mark{width:30px;height:30px;display:grid;place-items:center;background:var(--ink);color:var(--acid);font-family:var(--mono);font-size:12px}
+    .header-meta{display:flex;gap:22px;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+    .header-meta a{text-decoration:none}.header-meta a:hover{color:var(--ink)}
+    .frame{width:min(1380px,calc(100% - 56px));margin:0 auto}
+    .eyebrow,.section-kicker,.mono-label{margin:0;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.1em;line-height:1.4;text-transform:uppercase}
+    .hero{min-height:640px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:8vw;align-items:center;padding:88px 0 104px;border-bottom:1px solid var(--line)}
+    .hero h1{max-width:760px;margin:26px 0;font-size:clamp(48px,7.1vw,108px);font-weight:400;letter-spacing:-.075em;line-height:.95}
+    .hero h1 em{color:var(--ink-soft);font-style:normal}
+    .hero-lede{max-width:540px;margin:0;color:var(--ink-soft);font-size:clamp(17px,1.65vw,24px);letter-spacing:-.025em;line-height:1.35}
+    .hero-foot{display:flex;flex-wrap:wrap;gap:10px 24px;margin-top:52px;color:var(--muted);font-family:var(--mono);font-size:10px}
+    .hero-foot span:before{content:"";display:inline-block;width:6px;height:6px;margin:0 8px 1px 0;background:var(--ink)}
+    .signal{position:relative;min-height:390px;display:flex;flex-direction:column;justify-content:space-between;padding:28px;background:var(--ink);color:var(--white)}
+    .signal:after{content:"";position:absolute;right:0;bottom:0;width:58%;height:7px;background:var(--acid)}
+    .signal-top{display:flex;justify-content:space-between;gap:16px}.signal-top .mono-label{color:#a7a59e}.signal-top .mono-label:last-child{color:var(--acid)}
+    .signal h2{max-width:390px;margin:0;font-size:clamp(31px,4vw,58px);font-weight:400;letter-spacing:-.07em;line-height:.98}
+    .signal-copy{max-width:370px;margin:18px 0 0;color:#cbc9c1;font-size:14px}
+    .signal-line{height:74px;margin:12px 0 0;border-bottom:1px solid #4a4944}.signal-line svg{width:100%;height:100%}
+    .signal-line path{fill:none;stroke:var(--acid);stroke-width:2.2;vector-effect:non-scaling-stroke}.signal-line circle{fill:var(--acid)}
+    .signal-axis{display:flex;justify-content:space-between;margin-top:10px;color:#89877f;font-family:var(--mono);font-size:9px}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+    .metric{min-height:150px;padding:25px 24px 22px 0;border-right:1px solid var(--line)}.metric+.metric{padding-left:24px}.metric:last-child{border-right:0}
+    .metric-value{display:block;margin-top:22px;font-size:clamp(34px,4.4vw,62px);font-weight:400;letter-spacing:-.07em;line-height:.9}
+    .metric-context{display:block;margin-top:15px;color:var(--muted);font-size:12px}
+    .section{padding:112px 0;border-bottom:1px solid var(--line)}
+    .section-heading{display:grid;grid-template-columns:1fr 2fr;gap:40px;margin-bottom:60px}
+    .section-heading h2{max-width:760px;margin:0;font-size:clamp(34px,5vw,72px);font-weight:400;letter-spacing:-.065em;line-height:.98}
+    .section-heading p:not(.section-kicker){max-width:530px;margin:28px 0 0;color:var(--ink-soft);font-size:17px}
+    .stages{display:grid}
+    .stage-row{display:grid;grid-template-columns:190px minmax(0,1fr) 150px;gap:22px;align-items:center;min-height:87px;border-top:1px solid var(--line)}
+    .stage-row:last-child{border-bottom:1px solid var(--line)}.stage-period{font-family:var(--mono);font-size:11px}.stage-state{color:var(--muted);font-size:12px}
+    .stage-track{height:12px;display:flex;background:var(--paper-deep)}.stage-bar{width:var(--total);display:flex;min-width:3px;transform-origin:left;transform:scaleX(0);transition:transform .8s cubic-bezier(.22,.8,.2,1)}
+    .stage-bar.is-visible{transform:scaleX(1)}.bar-a{width:var(--a);background:var(--lav)}.bar-b{width:var(--b);background:var(--salmon)}
+    .stage-total{text-align:right;font-family:var(--mono);font-size:12px}.legend{display:flex;gap:18px;margin-top:18px;color:var(--muted);font-family:var(--mono);font-size:10px}
+    .legend-item:before{content:"";display:inline-block;width:9px;height:9px;margin-right:7px;background:var(--lav);vertical-align:-1px}.legend-item.b:before{background:var(--salmon)}
+    .split-grid,.timeline-layout,.state{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+    .panel{min-height:280px;padding:32px;background:var(--paper)}.panel.dark{background:var(--ink);color:var(--white)}
+    .panel h3{margin:22px 0 10px;font-size:25px;font-weight:400;letter-spacing:-.04em;line-height:1.1}.panel p{max-width:460px;margin:0;color:var(--ink-soft);font-size:14px}
+    .panel.dark p{color:#c5c3bb}.ratio{display:grid;grid-template-columns:45fr 55fr;height:34px;margin:38px 0 16px;background:var(--paper-deep)}.ratio-a{background:var(--lav)}.ratio-b{background:var(--salmon)}
+    .ratio-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px}.dark .ratio-labels{color:#d4d2c9}
+    .stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px}.stat-pair strong{display:block;font-size:34px;font-weight:400;letter-spacing:-.06em}.stat-pair span{display:block;margin-top:5px;color:var(--muted);font-family:var(--mono);font-size:9px;line-height:1.4;text-transform:uppercase}.dark .stat-pair span{color:#98968e}
+    .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:loop}.loop-step{position:relative;min-height:235px;padding:28px 30px 28px 0;border-top:1px solid var(--line)}.loop-step:not(:last-child){margin-right:30px}.loop-step:not(:last-child):after{content:"→";position:absolute;top:24px;right:2px;color:var(--muted);font-size:24px}
+    .loop-step:before{counter-increment:loop;content:"0" counter(loop);color:var(--muted);font-family:var(--mono);font-size:10px}.loop-step h3{margin:36px 0 10px;font-size:19px;font-weight:400;line-height:1.15}.loop-step p{margin:0;color:var(--muted);font-size:13px}
+    .timeline-list{padding:8px;background:var(--ink)}.timeline-button{width:100%;display:grid;grid-template-columns:90px 1fr;gap:15px;padding:18px 16px;border:0;border-bottom:1px solid #3b3b37;background:transparent;color:#9d9b94;text-align:left;cursor:pointer}
+    .timeline-button:last-child{border-bottom:0}.timeline-button:hover,.timeline-button[aria-selected=true]{background:var(--acid);color:var(--ink)}.timeline-button span:first-child{font-family:var(--mono);font-size:10px}.timeline-button span:last-child{font-size:13px;line-height:1.25}
+    .timeline-detail{min-height:410px;padding:42px;background:var(--white)}.detail-date{color:var(--muted);font-family:var(--mono);font-size:11px}.detail-title{max-width:620px;margin:38px 0 18px;font-size:clamp(28px,4vw,54px);font-weight:400;letter-spacing:-.06em;line-height:1}.detail-body{max-width:590px;margin:0;color:var(--ink-soft);font-size:16px}.detail-source{margin-top:42px;color:var(--muted);font-family:var(--mono);font-size:10px}
+    .evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}.evidence-card{min-height:280px;padding:28px;background:var(--white)}.evidence-card:nth-child(2){background:var(--lav)}.evidence-card:nth-child(3){background:var(--salmon)}
+    .evidence-card .number{font-family:var(--mono);font-size:10px}.evidence-card h3{margin:65px 0 12px;font-size:23px;font-weight:400;letter-spacing:-.04em;line-height:1.05}.evidence-card p{margin:0;color:var(--ink-soft);font-size:13px}.label-fact,.label-inference{display:inline-block;margin-top:24px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase}.label-inference{color:var(--muted)}
+    .state-main{min-height:360px;padding:38px;background:var(--acid)}.state-main h2{max-width:700px;margin:76px 0 0;font-size:clamp(36px,5.4vw,76px);font-weight:400;letter-spacing:-.075em;line-height:.95}
+    .state-side{display:flex;flex-direction:column;justify-content:space-between;min-height:360px;padding:38px;background:var(--ink);color:var(--white)}.state-side p{max-width:440px;margin:0;color:#c9c7bf;font-size:16px}.state-side .footnote{color:#89877f;font-family:var(--mono);font-size:10px}
+    .positions{display:grid;grid-template-columns:1fr 1fr;gap:24px}.position{padding-top:25px;border-top:1px solid var(--ink)}.position h3{margin:20px 0 10px;font-size:32px;font-weight:400;letter-spacing:-.06em}.position p{max-width:520px;margin:0;color:var(--ink-soft);font-size:15px}.accent-line{width:54px;height:8px;margin-top:26px;background:var(--lav)}.position.b .accent-line{background:var(--salmon)}
+    footer{padding:50px 0 70px}.footer-grid{display:grid;grid-template-columns:1fr 2fr;gap:40px}.footer-grid p{max-width:640px;margin:0;color:var(--muted);font-size:12px}.footer-grid p+p{margin-top:14px}.footer-mark{margin-top:50px;color:var(--muted);font-family:var(--mono);font-size:10px}
+    @media(max-width:900px){.hero{grid-template-columns:1fr;gap:52px;padding-top:64px}.section-heading{grid-template-columns:1fr;gap:24px}.stage-row{grid-template-columns:145px minmax(0,1fr) 90px;gap:14px}.timeline-layout{grid-template-columns:1fr}.timeline-list{display:grid;grid-template-columns:repeat(3,1fr)}.timeline-button{grid-template-columns:1fr;gap:6px}}
+    @media(max-width:650px){.site-header{height:62px;padding:0 18px}.header-meta{gap:10px;font-size:9px}.header-meta a{display:none}.frame{width:calc(100% - 36px)}.hero{min-height:0;padding:58px 0 70px}.hero h1{font-size:clamp(46px,15vw,78px)}.signal{min-height:320px;padding:22px}.metrics{grid-template-columns:1fr 1fr}.metric{min-height:120px;padding:20px 12px 18px 0;border-bottom:1px solid var(--line)}.metric:nth-child(2),.metric:nth-child(4){border-right:0;padding-left:12px}.metric:nth-child(3),.metric:nth-child(4){border-bottom:0}.metric-value{margin-top:15px;font-size:38px}.section{padding:72px 0}.section-heading{margin-bottom:40px}.stage-row{grid-template-columns:1fr 72px;gap:10px;padding:18px 0}.stage-row>:nth-child(2){grid-column:1/-1;grid-row:2}.stage-total{grid-column:2;grid-row:1}.stage-state{grid-column:1;grid-row:1}.split-grid,.evidence-grid,.state,.positions,.footer-grid{grid-template-columns:1fr}.panel,.evidence-card{min-height:0;padding:25px}.loop{grid-template-columns:1fr}.loop-step{min-height:0;padding:24px 0 34px}.loop-step:not(:last-child){margin-right:0;border-bottom:0}.loop-step:not(:last-child):after{content:"↓";top:auto;right:4px;bottom:3px}.loop-step h3{margin-top:24px}.timeline-list{grid-template-columns:1fr 1fr}.timeline-button{padding:14px 10px}.timeline-detail{min-height:330px;padding:28px}.state-main,.state-side{min-height:280px;padding:28px}.state-main h2{margin-top:62px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.stage-bar{transition:none}}
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">R</span><span>关系结构 / Yilii-m</span></div>
-      <nav class="topnav" aria-label="页面导航">
-        <a href="#phases">阶段</a>
-        <a href="#rhythm">互动</a>
-        <a href="#repair">修复</a>
-        <a href="#paths">路径</a>
-      </nav>
+  <div id="app">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="回到页面顶部"><span class="brand-mark">B/</span><span>BON / SUIZII</span></a>
+      <div class="header-meta"><span>RELATION MAP</span><a href="#stages">STAGES</a><a href="#timeline">TIMELINE</a><span>2026.08.18</span></div>
     </header>
-
-    <main>
-      <section class="hero" aria-labelledby="page-title">
-        <div>
-          <div class="eyebrow">WeFlow · 53,889 条私聊消息 · 2024.04—2026.08</div>
-          <h1 id="page-title">关系不是一个<br><span class="green">标签</span>，是一套<br><span class="blue">运行结构</span>。</h1>
-          <p class="hero-copy">这是一段长期、高频、双向投入的多功能关系：朋友式日常、创作/工作协作、情绪承接与现实互助交织在同一条聊天流里。2026 年的变化，首先表现为<strong>联系密度下降</strong>，而不是进入聊天后的回应消失。</p>
-          <p class="source-line">联系人：小李（WeChat ID <code>Yilii-m</code>） · 全量私聊 · 中立双边视角</p>
-        </div>
-        <div class="hero-note">
-          <div class="sticker">
-            <div class="sticker-label">中性判断</div>
-            <p>高投入的朋友与长期协作关系，带有情绪承接和现实互助功能。</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="metric-grid" aria-label="全量数据摘要">
-        <div class="metric"><div class="metric-label">消息总量</div><div class="metric-value">53,889</div><div class="metric-note">6 页 API 分页，未混入群聊</div></div>
-        <div class="metric"><div class="metric-label">发送量结构</div><div class="metric-value">50 / 50</div><div class="metric-note">用户侧 27,025 · 小李侧 26,864</div></div>
-        <div class="metric"><div class="metric-label">快速回应</div><div class="metric-value">96%+</div><div class="metric-note">双方跨人消息约 1 小时内回复</div></div>
-        <div class="metric"><div class="metric-label">现实互助</div><div class="metric-value">27.87h</div><div class="metric-note">77 次通话的累计时长</div></div>
-      </section>
-
-      <section id="phases" class="section" aria-labelledby="phases-title">
-        <div class="section-head">
-          <div><div class="section-kicker">01 / 时间演化</div><h2 id="phases-title">从高密度，走向事件触发。</h2></div>
-          <p>四个阶段的变化更像连接基础设施变化：共同事项越多，聊天越密；共同事项减少后，关系仍能重新接通，但不再全天候同步。</p>
-        </div>
-        <div class="stage-tabs" role="group" aria-label="选择阶段">
-          <button type="button" class="stage-tab" aria-pressed="true" data-stage="0">2024 · 建立</button>
-          <button type="button" class="stage-tab" aria-pressed="false" data-stage="1">2025 H1 · 峰值</button>
-          <button type="button" class="stage-tab" aria-pressed="false" data-stage="2">2025 H2 · 边界</button>
-          <button type="button" class="stage-tab" aria-pressed="false" data-stage="3">2026 · 收缩</button>
-        </div>
-        <div class="stage-detail" id="stage-detail"><strong>2024：快速建立高频连接。</strong> 工作、创作、兴趣、日常与玩笑开始共享同一条聊天流。</div>
-        <div class="timeline" id="timeline" aria-label="四阶段消息量柱状图"></div>
-        <div class="chart-frame">
-          <div class="chart-title">消息量与单日消息中位数</div>
-          <div class="legend" aria-label="图例"><span class="legend-item"><i class="legend-swatch green"></i>阶段消息量</span><span class="legend-item"><i class="legend-swatch blue"></i>单日消息中位数</span></div>
-          <svg id="phase-chart" role="img" aria-label="四个阶段的消息量和单日消息中位数折线图" viewBox="0 0 900 320"></svg>
-        </div>
-      </section>
-
-      <section id="rhythm" class="section" aria-labelledby="rhythm-title">
-        <div class="section-head">
-          <div><div class="section-kicker">02 / 双边互动</div><h2 id="rhythm-title">谁打开聊天，谁把内容铺开。</h2></div>
-          <p>发送量接近对半；用户侧更常重启长空档后的聊天，小李侧更常连续展开背景、计划和日常。一旦进入同一轮，回应速度高度接近。</p>
-        </div>
-        <div class="split">
+    <main id="top">
+      <div class="frame">
+        <section class="hero">
           <div>
-            <div class="block-title"><h3>会话节奏</h3><span class="subtle">6 小时以上空档后的重启</span></div>
-            <div class="balance-row"><div class="balance-head"><span>重新打开一轮聊天</span><span>773 个 episode</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:100%"></div></div><span class="bar-number">451</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:71.4%"></div></div><span class="bar-number">322</span></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>会话收尾</span><span>最后发言方</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:86.3%"></div></div><span class="bar-number">358</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:100%"></div></div><span class="bar-number">415</span></div></div></div>
-            <div class="callout green">这不是固定的一方追、一方敷衍：启动权与展开权分布在两侧。</div>
+            <p class="eyebrow">WeFlow / private chat / A = BON · B = Suizii</p>
+            <h1>不是普通朋友，<br><em>也没有成为伴侣。</em></h1>
+            <p class="hero-lede">一段曾经进入恋爱可能、最终没有完成关系确认的未命名亲密关系。</p>
+            <div class="hero-foot"><span>中立第三方视角</span><span>聊天证据 + 现实校准</span><span>2023.12 — 2026.08</span></div>
           </div>
-          <div>
-            <div class="block-title"><h3>回复效率</h3><span class="subtle">跨人消息</span></div>
-            <div class="balance-row"><div class="balance-head"><span>1 小时内回复</span><span>比例</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:97.54%"></div></div><span class="bar-number">97.54%</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:96.08%"></div></div><span class="bar-number">96.08%</span></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>回复中位数</span><span>秒</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:80%"></div></div><span class="bar-number">12s</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:100%"></div></div><span class="bar-number">16s</span></div></div></div>
-            <div class="callout">进入同一轮之后，双方都处于快速接收模式；变化主要发生在“是否进入”和“聊多久”。</div>
+          <aside class="signal" aria-label="当前关系状态">
+            <div class="signal-top"><span class="mono-label">CURRENT STATE</span><span class="mono-label">LOW-FREQUENCY</span></div>
+            <div><h2>日常共同体<br>已经停止运转。</h2><p class="signal-copy">连接没有被彻底切断，但主要靠具体事项、见面机会或主动试探重新接通。</p></div>
+            <div><div class="signal-line" aria-label="关系密度从高密度连接降至低频连接"><svg viewBox="0 0 360 74" role="img" aria-label="关系密度变化曲线"><path d="M4 14 C42 10,59 17,82 13 S124 24,150 27 S183 42,209 38 S246 50,277 48 S317 60,356 58"></path><circle cx="4" cy="14" r="4"></circle><circle cx="150" cy="27" r="4"></circle><circle cx="356" cy="58" r="4"></circle></svg></div><div class="signal-axis"><span>2023.12</span><span>2025.01</span><span>2026.08</span></div></div>
+          </aside>
+        </section>
+        <section class="metrics" aria-label="数据摘要">
+          <div class="metric"><p class="mono-label">MESSAGES</p><strong class="metric-value">18,233</strong><span class="metric-context">WeFlow 全量私聊消息</span></div>
+          <div class="metric"><p class="mono-label">ACTIVE DAYS</p><strong class="metric-value">396</strong><span class="metric-context">2023.12.27 — 2026.08.15</span></div>
+          <div class="metric"><p class="mono-label">TEXT SHARE</p><strong class="metric-value">45 / 55</strong><span class="metric-context">A / B 消息占比约值</span></div>
+          <div class="metric"><p class="mono-label">CALLS</p><strong class="metric-value">4</strong><span class="metric-context">通话总计约 16 分钟</span></div>
+        </section>
+
+        <section class="section" id="stages">
+          <div class="section-heading"><p class="section-kicker">01 / density over time</p><div><h2>关系不是突然消失，<br>而是逐步退出日常。</h2><p>消息总量从高密度共同体退到事件触发式连接。进入同一轮聊天后，双方回复仍然较快；真正减少的是重新进入共同空间的频率。</p></div></div>
+          <div class="stages" aria-label="各阶段消息量与消息构成">
+            <div class="stage-row"><div class="stage-period">2023.12 — 2024</div><div><div class="stage-track"><div class="stage-bar" style="--total:100%;--a:47.6%;--b:52.4%"><i class="bar-a"></i><i class="bar-b"></i></div></div><div class="stage-state">快速熟悉 / 玩笑密集 / 日常混合</div></div><div class="stage-total">13,584</div></div>
+            <div class="stage-row"><div class="stage-period">2025 H1</div><div><div class="stage-track"><div class="stage-bar" style="--total:28.2%;--a:36.5%;--b:63.5%"><i class="bar-a"></i><i class="bar-b"></i></div></div><div class="stage-state">仍有密度 / 关系参数更明显</div></div><div class="stage-total">3,834</div></div>
+            <div class="stage-row"><div class="stage-period">2025 H2</div><div><div class="stage-track"><div class="stage-bar" style="--total:4.8%;--a:38.4%;--b:61.6%"><i class="bar-a"></i><i class="bar-b"></i></div></div><div class="stage-state">文字下降 / 见面与具体行动仍在</div></div><div class="stage-total">649</div></div>
+            <div class="stage-row"><div class="stage-period">2026 — 末次</div><div><div class="stage-track"><div class="stage-bar" style="--total:1.2%;--a:50%;--b:50%"><i class="bar-a"></i><i class="bar-b"></i></div></div><div class="stage-state">长时间沉默 / 具体事件重新接通</div></div><div class="stage-total">166</div></div>
           </div>
-        </div>
-        <div class="split">
-          <div>
-            <div class="block-title"><h3>表达功能的非对称</h3><span class="subtle">关键词线索，不是心理诊断</span></div>
-            <div class="balance-row"><div class="balance-head"><span>check-in</span><span>确认在线或状态</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:100%"></div></div><span class="bar-number">79</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:20.3%"></div></div><span class="bar-number">16</span></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>生活分享</span><span>日常、身体、见闻</span></div><div class="dual-bars"><div class="bar-line"><span>用户侧</span><div class="bar-track"><div class="bar-fill user" style="width:56.8%"></div></div><span class="bar-number">159</span></div><div class="bar-line"><span>小李侧</span><div class="bar-track"><div class="bar-fill peer" style="width:100%"></div></div><span class="bar-number">280</span></div></div></div>
+          <div class="legend"><span class="legend-item">A / BON</span><span class="legend-item b">B / Suizii</span><span>条形长度按全周期消息量比例</span></div>
+        </section>
+
+        <section class="section">
+          <div class="section-heading"><p class="section-kicker">02 / observable structure</p><div><h2>连接是双向的，<br>重新点火并不对称。</h2><p>双方都在参与维持，但主动分享、主动检查、主动约见和关系参数讨论更多出现在 B 一侧。这里描述的是行为结构，不把它直接等同于动机。</p></div></div>
+          <div class="split-grid">
+            <article class="panel"><p class="mono-label">MESSAGE BALANCE</p><div class="ratio" role="img" aria-label="A BON 约45%，B Suizii 约55%的消息占比"><span class="ratio-a"></span><span class="ratio-b"></span></div><div class="ratio-labels"><span>A / BON · 8,195</span><span>B / Suizii · 10,038</span></div><div class="stat-pair"><div><strong>124</strong><span>A 重新开启聊天</span></div><div><strong>328</strong><span>B 重新开启聊天</span></div></div></article>
+            <article class="panel dark"><p class="mono-label">REPLY TEMPO</p><h3>进入一轮对话后，<br>回复并不慢。</h3><p>跨人回复中位数：A 回复 B 约 66 秒，B 回复 A 约 23 秒。变化更像是“多久再次进入”，而不是“进入后是否愿意回应”。</p><div class="stat-pair"><div><strong>66s</strong><span>A → B / median</span></div><div><strong>23s</strong><span>B → A / median</span></div></div></article>
           </div>
-          <div>
-            <div class="block-title"><h3>去工作化测试</h3><span class="subtle">独立于工作词的活跃日</span></div>
-            <div class="metric" style="background:var(--soft-green);"><div class="metric-label">无明显工作词的活跃日</div><div class="metric-value">266</div><div class="metric-note">其中单日直接文本可达 323 条，说明工作是重要连接器，但不是唯一内容。</div></div>
-            <div class="source-line">代表日期：2025-01-23（323 条）、2025-11-07（154 条）、2026-02-05（123 条）。</div>
+        </section>
+
+        <section class="section">
+          <div class="section-heading"><p class="section-kicker">03 / interaction loop</p><div><h2>靠近与保留，<br>构成了反复出现的循环。</h2><p>这是一种从聊天中归纳出的互动模式：它能解释关系为什么持续，也能解释为什么始终没有自然变成稳定的伴侣关系。</p></div></div>
+          <div class="loop">
+            <article class="loop-step"><h3>B 靠近</h3><p>分享生活、试探、表达想念或提出见面。</p></article>
+            <article class="loop-step"><h3>A 回应并降压</h3><p>继续回应，但常通过玩笑、模糊答案或延后处理降低正面压力。</p></article>
+            <article class="loop-step"><h3>B 追问参数</h3><p>继续询问关系位置、消息频率或见面边界，再把尴尬转成玩笑。</p></article>
+            <article class="loop-step"><h3>恢复日常，问题留存</h3><p>短期重新接上，但没有形成正式约定；下一次沉默后 B 更常重新开启。</p></article>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="section" aria-labelledby="invite-title">
-        <div class="section-head">
-          <div><div class="section-kicker">03 / 回应邀请</div><h2 id="invite-title">高回应，不总是同频道。</h2></div>
-          <p>双方通常会回，但回应方式未必正好匹配发起者的初始需要：想被听见时可能收到建议，想要判断时可能收到玩笑或更多背景。</p>
-        </div>
-        <div class="table-responsive" style="overflow-x:auto;">
-          <table class="invite-table">
-            <thead><tr><th>邀请类型</th><th>用户侧发出</th><th>小李侧回复率</th><th>小李侧发出</th><th>用户侧回复率</th></tr></thead>
-            <tbody>
-              <tr><td><strong>check-in</strong></td><td>79</td><td class="rate peer">92.41%</td><td>16</td><td class="rate user">81.25%</td></tr>
-              <tr><td><strong>脆弱 / 负面</strong></td><td>141</td><td class="rate peer">94.33%</td><td>211</td><td class="rate user">90.52%</td></tr>
-              <tr><td><strong>生活分享</strong></td><td>159</td><td class="rate peer">93.71%</td><td>280</td><td class="rate user">89.64%</td></tr>
-              <tr><td><strong>玩笑</strong></td><td>770</td><td class="rate peer">91.43%</td><td>1,508</td><td class="rate user">88.06%</td></tr>
-              <tr><td><strong>征求意见</strong></td><td>96</td><td class="rate peer">98.96%</td><td>166</td><td class="rate user">93.37%</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout">回应率高，频道匹配度低到中等：问题更像“怎么回应”，而不是“完全不回应”。</div>
-      </section>
-
-      <section class="section" aria-labelledby="cycle-title">
-        <div class="section-head">
-          <div><div class="section-kicker">04 / 互动循环</div><h2 id="cycle-title">顺畅时，关系像协作系统。</h2></div>
-          <p>外部事项带来共同语境；共同语境带来快速接入；摩擦则多发生在情绪频道与解决频道切换过快的时刻。</p>
-        </div>
-        <div class="flow" aria-label="正向互动流程">
-          <div class="flow-step"><div class="flow-num">1</div><h3>事件出现</h3><p>项目、兴趣事件、出行或现实安排成为同步理由。</p></div>
-          <div class="flow-step"><div class="flow-num">2</div><h3>快速接入</h3><p>一方发起，另一方迅速回应，共享上下文立即生效。</p></div>
-          <div class="flow-step"><div class="flow-num">3</div><h3>共同推进</h3><p>双方补背景、给意见、推进具体动作或处理临时问题。</p></div>
-          <div class="flow-step"><div class="flow-num">4</div><h3>功能恢复</h3><p>事情暂时完成后，玩笑与闲聊让对话回到熟悉状态。</p></div>
-        </div>
-      </section>
-
-      <section id="repair" class="section" aria-labelledby="repair-title">
-        <div class="section-head">
-          <div><div class="section-kicker">05 / 冲突修复</div><h2 id="repair-title">功能恢复强于显性收尾。</h2></div>
-          <p>10 个冲突候选窗口多数是项目摩擦、催回复、调侃过界或即时误会，不等于 10 次严重冲突。自动规则更容易识别“继续做事”和“开玩笑”，不容易识别完整收尾。</p>
-        </div>
-        <div class="repair-grid">
-          <div class="repair-visual" aria-label="修复动作统计">
-            <div class="repair-row"><span>候选窗口</span><div class="repair-track"><div class="repair-fill" style="width:100%"></div></div><span class="repair-num">10</span></div>
-            <div class="repair-row"><span>出现玩笑</span><div class="repair-track"><div class="repair-fill" style="width:80%"></div></div><span class="repair-num">8</span></div>
-            <div class="repair-row"><span>回到工作</span><div class="repair-track"><div class="repair-fill" style="width:40%"></div></div><span class="repair-num">4</span></div>
-            <div class="repair-row"><span>验证/承认</span><div class="repair-track"><div class="repair-fill" style="width:40%"></div></div><span class="repair-num">4</span></div>
-            <div class="repair-row"><span>显性收尾</span><div class="repair-track"><div class="repair-fill" style="width:1%"></div></div><span class="repair-num">0*</span></div>
+        <section class="section" id="timeline">
+          <div class="section-heading"><p class="section-kicker">04 / selected evidence</p><div><h2>几个节点，改变了关系的读法。</h2><p>点击左侧节点查看对应的聊天证据与分析含义。事实与推断分开呈现，避免把关系解释伪装成原话。</p></div></div>
+          <div class="timeline-layout">
+            <div class="timeline-list" role="tablist" aria-label="关系关键节点">
+              <button class="timeline-button" role="tab" aria-selected="true" data-date="2024.05.29" data-title="一次直球，被迅速转成玩笑。" data-body="B 先说“想打个直球”，随后解释只是“有点点想你”，并担心让 A 受到惊吓；A 没有直接展开回应，B 很快把尴尬转成玩笑。" data-source="聊天原文 / 2024-05-29"><span>2024.05.29</span><span>情绪表达</span></button>
+              <button class="timeline-button" role="tab" aria-selected="false" data-date="2025.02.04" data-title="B 开始询问关系参数。" data-body="B 一次性提出见面频次、主动与被动邀约、见面才贴是否算黏人、当前程度是否可接受，以及是否应该少发消息等问题。A 的回应没有提供足够明确的关系参数。" data-source="聊天原文 / 2025-02-04"><span>2025.02.04</span><span>关系协商</span></button>
+              <button class="timeline-button" role="tab" aria-selected="false" data-date="2025.02.17" data-title="模糊回答本身，成为被讨论的问题。" data-body="B 进一步说明自己不喜欢 A 的回答方式：即使已经列出 A/B 选项，仍然得到模糊回应；如果自己不主动询问，A 通常不会主动提起相关问题。" data-source="聊天原文 / 2025-02-17"><span>2025.02.17</span><span>可预测性</span></button>
+              <button class="timeline-button" role="tab" aria-selected="false" data-date="2025.11.24" data-title="想见、想念与不确定性同时出现。" data-body="B 说“单纯想见一下而已”，晚些时候又表达不想从蛛丝马迹确认 A 是否安好。当天也出现了关于“偶尔想起”和“会想”的对话，随后双方回到日常话题。" data-source="聊天原文 / 2025-11-24"><span>2025.11.24</span><span>重新靠近</span></button>
+              <button class="timeline-button" role="tab" aria-selected="false" data-date="2025.12" data-title="文字变少，但具体关心仍然存在。" data-body="B 主动约电影；在 A 长时间不回时多次确认是否安全，并说“差点打车上门逮你了”“反正我一直都在”。这支持“低频但事件触发式连接”的判断。" data-source="聊天原文 / 2025-12"><span>2025.12</span><span>具体行动</span></button>
+              <button class="timeline-button" role="tab" aria-selected="false" data-date="2026.01" data-title="连接仍能接上，但已不再是日常底色。" data-body="2026 年仍出现见面、到达确认和具体行动安排；与此同时，全年消息量只有 166 条、活跃日 18 天。熟悉口吻仍在，过去的密度已经不在。" data-source="聊天统计 + 原文 / 2026-01"><span>2026.01</span><span>残留连接</span></button>
+            </div>
+            <article class="timeline-detail" aria-live="polite"><div class="detail-date">2024.05.29 / CHAT EVIDENCE</div><h3 class="detail-title">一次直球，被迅速转成玩笑。</h3><p class="detail-body">B 先说“想打个直球”，随后解释只是“有点点想你”，并担心让 A 受到惊吓；A 没有直接展开回应，B 很快把尴尬转成玩笑。</p><div class="detail-source">来源：聊天原文 / 2024-05-29</div></article>
           </div>
-          <div class="repair-note"><h3>修复资产</h3><p>继续处理事情、切回日常、使用共享玩笑，能让互动快速恢复。</p><h3 style="margin-top:22px;">结构风险</h3><p>如果只恢复功能，不补充“发生了什么—需要什么—下次改什么”，问题会被延期到下一次共同事项。</p></div>
-        </div>
-        <p class="subtle" style="margin-top:18px;">*“显性收尾”为自动规则下的结果，不代表其他句子或线下没有完成修复。</p>
-      </section>
+        </section>
 
-      <section class="section" aria-labelledby="assets-title">
-        <div class="section-head">
-          <div><div class="section-kicker">06 / 关系资产</div><h2 id="assets-title">共享语境，是最强的重新接通能力。</h2></div>
-          <p>工作流程、兴趣、物品、城市、出行和既往事件反复交叉，降低了重新建立话题的成本；但共享语境也会让一句短话承载过多未说出的背景。</p>
-        </div>
-        <div class="split">
-          <div>
-            <div class="block-title"><h3>五个可观察资产</h3><span class="subtle">双边数据支持</span></div>
-            <div class="balance-row"><div class="balance-head"><span>双边投入</span><span>消息量近似对半</span></div><div class="bar-track"><div class="bar-fill user" style="width:50.15%"></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>快速响应</span><span>双方 1 小时内均超过 96%</span></div><div class="bar-track"><div class="bar-fill peer" style="width:96.81%"></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>现实协作</span><span>77 次通话 · 27.87 小时</span></div><div class="bar-track"><div class="bar-fill user" style="width:77%"></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>独立于工作</span><span>266 个活跃日</span></div><div class="bar-track"><div class="bar-fill peer" style="width:66.5%"></div></div></div>
-            <div class="balance-row"><div class="balance-head"><span>重新接通</span><span>最长空档后仍能自然恢复</span></div><div class="bar-track"><div class="bar-fill user" style="width:84%"></div></div></div>
+        <section class="section">
+          <div class="section-heading"><p class="section-kicker">05 / evidence boundary</p><div><h2>事实、模式、命名，<br>不是同一层证据。</h2><p>可视化只把聊天中能观察到的内容与 BON 补充的现实校准并列放置，不用单一标签覆盖所有不确定性。</p></div></div>
+          <div class="evidence-grid">
+            <article class="evidence-card"><span class="number">A / DIRECT</span><h3>双方有想念、见面期待与日常连接。</h3><p>聊天中出现直接表达、主动邀约、共同兴趣和大量非工作日常。</p><span class="label-fact">可观察事实</span></article>
+            <article class="evidence-card"><span class="number">B / PATTERN</span><h3>B 更常重新打开连接。</h3><p>这解释了主动性与不确定性成本的分布，但不直接证明任何一方的内在动机。</p><span class="label-inference">互动模式推断</span></article>
+            <article class="evidence-card"><span class="number">C / REALITY CHECK</span><h3>曾考虑交往，最终没有确定关系。</h3><p>这是 BON 在本次分析中提供的现实校准，不能从聊天记录单独验证。</p><span class="label-inference">外部现实校准</span></article>
           </div>
-          <div class="callout green" style="margin-top:0;">资产不是义务。高回应、共享语境和现实互助说明关系有承载能力，但不能自动推出双方必须持续在线或承担同等形式的帮助。</div>
-        </div>
-      </section>
+        </section>
 
-      <section id="paths" class="section" aria-labelledby="paths-title">
-        <div class="section-head">
-          <div><div class="section-kicker">07 / 关系调整</div><h2 id="paths-title">四种结构路径，各有代价。</h2></div>
-          <p>这里不预设双方应该选择哪一种，只展示联系密度、工作混线和共享语境之间的取舍。</p>
-        </div>
-        <div class="path-grid">
-          <article class="path"><div class="path-number">PATH 01</div><h3>维持高密度混合</h3><p>重新接入成本最低，熟悉感最强；工作摩擦和容量透支也最容易重演。</p></article>
-          <article class="path"><div class="path-number">PATH 02</div><h3>低耦合协作</h3><p>保留互补资源，把负责人、同步点和返工边界说清楚，减少任务侵入日常。</p></article>
-          <article class="path"><div class="path-number">PATH 03</div><h3>保留非工作交流</h3><p>朋友频道更清楚，交付压力下降；工作互补消失后，日常频率可能继续变低。</p></article>
-          <article class="path"><div class="path-number">PATH 04</div><h3>阶段性低接触</h3><p>快速降低刺激和负荷；共享语境会变薄，之后重新接通需要更多上下文。</p></article>
-        </div>
-      </section>
+        <section class="section">
+          <div class="section-heading"><p class="section-kicker">06 / current state</p><div><h2>现在要判断的，<br>不是过去有没有靠近。</h2><p>更关键的是：双方是否接受同一种关系定义，以及各自愿意承担多少由“不定义”带来的不确定性成本。</p></div></div>
+          <div class="state"><div class="state-main"><p class="mono-label">AS OF 2026.08.15</p><h2>低频、偶尔亲近、仍可重新接通。</h2></div><div class="state-side"><p>有过高强度情绪互动历史，有感情残留、安全感记忆与重新接通能力，但日常共同体已经停止运转。若互动模式不变，更可能继续保持低频、偶尔亲近、偶尔长时间消失的残留型亲密关系。</p><span class="footnote">这是一种基于当前互动结构的情景判断，不是对未来的确定预言。</span></div></div>
+        </section>
 
-      <section class="section" aria-labelledby="method-title">
-        <div class="section-head"><div><div class="section-kicker">08 / 证据边界</div><h2 id="method-title">能看见结构，不能替双方发言。</h2></div><p>这页只呈现 WeFlow 私聊里可复核的互动数据与谨慎推断。</p></div>
-        <div class="method">
-          <p>图片、语音和视频未做语义识别；工作、生活、脆弱、关心和回应频道来自保守规则，存在误报和漏报。消息量、回复率和重新接通能力能证明互动结构，不能单独证明双方未说出口的感受、承诺或关系定义。</p>
-          <ul class="method-list">
-            <li><strong>数据：</strong>WeFlow API，6 页私聊全量</li>
-            <li><strong>时间：</strong>2024-04-15 17:31 — 2026-08-18 06:52</li>
-            <li><strong>联系人：</strong>Yilii-m / 小李</li>
-            <li><strong>更新：</strong>2026-08-18</li>
-          </ul>
-        </div>
-      </section>
+        <section class="section">
+          <div class="section-heading"><p class="section-kicker">07 / two positions</p><div><h2>两个位置，都保留在画面里。</h2></div></div>
+          <div class="positions">
+            <article class="position"><p class="mono-label">A / BON</p><h3>保持连接，同时保留定义空间。</h3><p>BON 将 B 视为重要且熟悉的人，愿意共享玩笑、日常和共同活动，也参与过高强度情绪互动；但最终没有选择把关系确定为伴侣关系。聊天行为显示，BON 更常通过回应、玩笑、模糊或延后处理来保持连接。</p><div class="accent-line"></div></article>
+            <article class="position b"><p class="mono-label">B / SUIZII</p><h3>持续靠近，同时寻找可预测性。</h3><p>B 将 A 视为可以持续分享、想念和担心的人。B 的表达更直接，重新开启连接、提出见面和讨论关系参数的行为更多；在没有得到明确回应时，B 常使用玩笑、自嘲或短暂撤回来降低暴露感。</p><div class="accent-line"></div></article>
+          </div>
+        </section>
+      </div>
     </main>
-    <footer class="footer">关系结构可视化 · 参考 Refero 的 Duolingo 风格语言制作 · 数据解释保持中立双边视角</footer>
+    <footer><div class="frame"><div class="footer-grid"><p class="section-kicker">METHOD / LIMITS</p><div><p>数据来自 WeFlow 本地 API 的 Suizii 私聊全量分页拉取：18,233 条消息，时间范围为 2023-12-27 至 2026-08-15。数字指标用于定位模式；关键词匹配可能存在误报，关键日期结合上下文人工复核。</p><p>聊天记录不能替代双方对现实关系的确认。报告没有把群聊、朋友圈、第三方转发或未能从双方聊天直接验证的内容作为双方关系证据。</p></div></div><div class="footer-mark">BON / SUIZII — RELATION MAP — 2026.08.18</div></div></footer>
   </div>
-
   <script>
-    (function () {
-      const root = document;
-      const phases = [
-        { name: "2024", label: "建立", messages: 17937, active: 234, median: 42, detail: "2024：快速建立高频连接。工作、创作、兴趣、日常与玩笑开始共享同一条聊天流。" },
-        { name: "2025 H1", label: "峰值", messages: 17950, active: 163, median: 81, detail: "2025 上半年：观察期内密度最高，双方共同处理的事情和连续对话最多。" },
-        { name: "2025 H2", label: "边界", messages: 12991, active: 149, median: 48, detail: "2025 下半年：仍然高频，但容量、分工、回应和边界开始更明确地进入对话。" },
-        { name: "2026", label: "收缩", messages: 5009, active: 118, median: 27, detail: "2026：联系总体收缩，最长空档约 67 天；重新接通后仍保留共享语境。" }
-      ];
-
-      const timeline = root.getElementById("timeline");
-      const maxMessages = Math.max.apply(null, phases.map(p => p.messages));
-      phases.forEach((phase, index) => {
-        const item = root.createElement("div");
-        item.className = "phase";
-        item.innerHTML = `<div class="phase-bar-wrap"><div class="phase-bar" style="height:${Math.max(14, phase.messages / maxMessages * 100)}%" data-tooltip="${phase.name}：${phase.messages.toLocaleString()} 条消息"></div></div><div class="phase-value">${phase.messages.toLocaleString()}</div><div class="phase-label">${phase.name} · ${phase.label}</div><div class="phase-meta">${phase.active} 个活跃日 · 中位数 ${phase.median}</div>`;
-        timeline.appendChild(item);
+    const stageBars = document.querySelectorAll(".stage-bar");
+    if ("IntersectionObserver" in window) {
+      const stageObserver = new IntersectionObserver((entries, observer) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          stageBars.forEach((bar) => bar.classList.add("is-visible"));
+          observer.disconnect();
+        }
+      }, { threshold: 0.15 });
+      stageObserver.observe(document.querySelector(".stages"));
+    } else {
+      stageBars.forEach((bar) => bar.classList.add("is-visible"));
+    }
+    const timelineButtons = Array.from(document.querySelectorAll(".timeline-button"));
+    const detailDate = document.querySelector(".detail-date");
+    const detailTitle = document.querySelector(".detail-title");
+    const detailBody = document.querySelector(".detail-body");
+    const detailSource = document.querySelector(".detail-source");
+    timelineButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        timelineButtons.forEach((item) => item.setAttribute("aria-selected", String(item === button)));
+        detailDate.textContent = button.dataset.date + " / " + (button.dataset.date === "2025.12" ? "ACTION EVIDENCE" : "CHAT EVIDENCE");
+        detailTitle.textContent = button.dataset.title;
+        detailBody.textContent = button.dataset.body;
+        detailSource.textContent = "来源：" + button.dataset.source;
       });
-
-      const detail = root.getElementById("stage-detail");
-      root.querySelectorAll(".stage-tab").forEach(button => {
-        button.addEventListener("click", () => {
-          const index = Number(button.dataset.stage);
-          root.querySelectorAll(".stage-tab").forEach(tab => tab.setAttribute("aria-pressed", String(tab === button)));
-          detail.innerHTML = `<strong>${phases[index].detail.split("。")[0]}。</strong>${phases[index].detail.split("。").slice(1).join("。")}`;
-          root.querySelectorAll(".phase-bar").forEach((bar, barIndex) => bar.style.opacity = barIndex === index ? "1" : ".48");
-        });
-      });
-
-      const svg = root.getElementById("phase-chart");
-      const width = 900, height = 320, left = 54, right = 28, top = 28, bottom = 54;
-      const innerW = width - left - right, innerH = height - top - bottom;
-      const x = index => left + index * innerW / (phases.length - 1);
-      const maxMsg = 20000, maxMedian = 90;
-      const yMsg = value => top + innerH - value / maxMsg * innerH;
-      const yMedian = value => top + innerH - value / maxMedian * innerH;
-      let chart = `<title>四个阶段的消息量和单日消息中位数</title><desc>2025 上半年消息密度最高，2026 总体收缩。</desc>`;
-      [0, 5000, 10000, 15000, 20000].forEach(value => {
-        const y = yMsg(value);
-        chart += `<line class="chart-gridline" x1="${left}" y1="${y}" x2="${width - right}" y2="${y}"/><text class="chart-label" x="${left - 10}" y="${y + 4}" text-anchor="end">${value === 0 ? "0" : (value / 1000) + "k"}</text>`;
-      });
-      chart += `<line class="chart-axis" x1="${left}" y1="${top + innerH}" x2="${width - right}" y2="${top + innerH}"/>`;
-      chart += `<line class="chart-axis" x1="${left}" y1="${top}" x2="${left}" y2="${top + innerH}"/>`;
-      const messagePoints = phases.map((p, i) => `${x(i)},${yMsg(p.messages)}`).join(" ");
-      const medianPoints = phases.map((p, i) => `${x(i)},${yMedian(p.median)}`).join(" ");
-      chart += `<polyline class="chart-line" points="${messagePoints}"/><polyline class="chart-line secondary" points="${medianPoints}"/>`;
-      phases.forEach((phase, i) => {
-        const px = x(i), py = yMsg(phase.messages), sy = yMedian(phase.median);
-        chart += `<circle class="chart-dot" cx="${px}" cy="${py}" r="7" data-tooltip="${phase.name}：${phase.messages.toLocaleString()} 条消息"/><circle class="chart-dot secondary" cx="${px}" cy="${sy}" r="6" data-tooltip="${phase.name}：单日中位数 ${phase.median} 条"/>`;
-        chart += `<text class="chart-value" x="${px}" y="${py - 14}" text-anchor="middle">${(phase.messages / 1000).toFixed(1)}k</text><text class="chart-label" x="${px}" y="${height - 25}" text-anchor="middle">${phase.name}</text>`;
-      });
-      chart += `<text class="chart-label" x="${left}" y="${height - 5}">阶段</text><text class="chart-label" x="${left}" y="${top - 10}">消息量</text>`;
-      svg.innerHTML = chart;
-    }());
+    });
   </script>
 </body>
 </html>
+
