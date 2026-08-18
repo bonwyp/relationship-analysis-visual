@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我与杨杨616｜十一维度关系分析</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #ffffff;
+      --ink: #4b4b4b;
+      --ink-strong: #2f2f2f;
+      --muted: #777777;
+      --faded: #afafaf;
+      --line: #e5e5e5;
+      --line-strong: #d5d5d5;
+      --green: #58cc02;
+      --green-dark: #46a302;
+      --green-soft: #d7ffb8;
+      --green-pale: #f2ffe8;
+      --blue: #1cb0f6;
+      --blue-dark: #1187bd;
+      --blue-soft: #ddf4ff;
+      --night: #000437;
+      --yellow: #ffc800;
+      --yellow-soft: #fff4c2;
+      --coral: #ff7a69;
+      --coral-soft: #ffe4df;
+      --violet: #a570ff;
+      --violet-soft: #eee4ff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-rounded, "Nunito Sans", "Avenir Next Rounded", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+    button:focus-visible, a:focus-visible { outline: 4px solid var(--blue-soft); outline-offset: 3px; }
+    .page { width: min(1200px, calc(100% - 48px)); margin: 0 auto; padding: 0 0 84px; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 82px;
+      margin-bottom: 74px;
+      border-bottom: 2px solid var(--line);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--green); font-size: 17px; font-weight: 900; letter-spacing: -.02em; }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; color: white; background: var(--green); font-size: 18px; transform: rotate(-4deg); }
+    .top-jump {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 2px solid var(--line-strong);
+      border-radius: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .06em;
+    }
+    .top-jump:hover { color: var(--blue); border-color: var(--blue); }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(310px, .62fr); gap: 58px; align-items: center; }
+    .hero-copy { position: relative; }
+    .hero-copy::after {
+      content: "";
+      position: absolute;
+      right: 3%;
+      bottom: -34px;
+      width: 62px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--yellow);
+      transform: rotate(-8deg);
+      opacity: .85;
+    }
+    .eyebrow { color: var(--green); font-size: 13px; letter-spacing: .09em; font-weight: 900; text-transform: uppercase; }
+    h1 { margin: 14px 0 22px; color: var(--ink-strong); font-size: clamp(44px, 6.4vw, 72px); line-height: 1.13; letter-spacing: -.035em; font-weight: 900; }
+    h1 span { color: var(--green); }
+    .lead { max-width: 760px; margin: 0; color: var(--muted); font-size: clamp(17px, 2vw, 21px); line-height: 1.55; }
+    .scope {
+      position: relative;
+      padding: 28px;
+      border: 2px solid var(--green);
+      border-radius: 20px;
+      background: var(--green-pale);
+      box-shadow: 0 6px 0 var(--green-soft);
+      overflow: hidden;
+    }
+    .scope::after { content: "●"; position: absolute; right: 20px; top: 14px; color: var(--green-soft); font-size: 66px; line-height: 1; }
+    .scope strong { position: relative; z-index: 1; display: block; margin-bottom: 13px; color: var(--green-dark); font-size: 17px; font-weight: 900; }
+    .scope p { position: relative; z-index: 1; margin: 5px 0; color: var(--muted); font-size: 13px; }
+    .scope .excluded { margin-top: 15px; padding-top: 13px; border-top: 2px solid var(--green-soft); color: var(--ink); font-weight: 800; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 70px 0 0; }
+    .stat { min-height: 175px; padding: 22px; border: 2px solid var(--line); border-radius: 18px; background: var(--paper); }
+    .stat:nth-child(1) { border-color: var(--green); background: var(--green-pale); }
+    .stat:nth-child(2) { border-color: var(--coral); background: var(--coral-soft); }
+    .stat:nth-child(3) { border-color: var(--blue); background: var(--blue-soft); }
+    .stat:nth-child(4) { border-color: var(--yellow); background: var(--yellow-soft); }
+    .stat-label { min-height: 40px; color: var(--muted); font-size: 13px; font-weight: 800; }
+    .stat-value { margin: 8px 0 6px; color: var(--ink-strong); font-size: clamp(30px, 4vw, 42px); line-height: 1.05; font-weight: 900; letter-spacing: -.035em; }
+    .stat-note { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .section { margin-top: 112px; scroll-margin-top: 22px; }
+    .section-head { display: grid; grid-template-columns: minmax(0, .9fr) minmax(320px, .58fr); gap: 44px; align-items: end; margin-bottom: 34px; }
+    .section h2 { margin: 6px 0 0; color: var(--green); font-size: clamp(36px, 5vw, 52px); line-height: 1.16; letter-spacing: -.03em; font-weight: 900; }
+    .section-head p { margin: 0 0 5px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .panel { padding: 28px; border: 2px solid var(--line); border-radius: 20px; background: var(--paper); }
+    .panel-title { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 26px; }
+    .panel-title strong { color: var(--ink-strong); font-size: 18px; font-weight: 900; }
+    .panel-title span { color: var(--faded); font-size: 12px; font-weight: 800; }
+    .bars { display: grid; gap: 18px; }
+    .bar-row { display: grid; grid-template-columns: 72px 1fr 62px; gap: 12px; align-items: center; color: var(--muted); font-size: 14px; font-weight: 800; }
+    .bar-track { height: 16px; border-radius: 999px; background: #eeeeee; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: inherit; background: var(--green); }
+    .bar-fill.secondary { background: var(--blue); }
+    .bar-value { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+    .dot.secondary { background: var(--blue); }
+    .timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-top: 34px; }
+    .phase { position: relative; min-height: 154px; padding: 30px 18px 18px; border-top: 3px solid var(--line); }
+    .phase::before { content: ""; position: absolute; top: -10px; left: 18px; width: 16px; height: 16px; border: 3px solid var(--paper); border-radius: 50%; background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+    .phase:nth-child(4)::before, .phase:nth-child(5)::before { background: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+    .phase-year { color: var(--faded); font-size: 12px; font-weight: 900; }
+    .phase-name { margin: 5px 0 7px; color: var(--ink-strong); font-weight: 900; }
+    .phase p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .loop { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+    .loop-step { position: relative; min-height: 180px; padding: 24px; border: 2px solid var(--line); border-radius: 18px; background: var(--paper); }
+    .loop-step:nth-child(1) { border-color: var(--yellow); background: var(--yellow-soft); }
+    .loop-step:nth-child(2) { border-color: var(--violet); background: var(--violet-soft); }
+    .loop-step:nth-child(3) { border-color: var(--blue); background: var(--blue-soft); }
+    .loop-step:nth-child(4) { border-color: var(--green); background: var(--green-pale); }
+    .loop-step:not(:last-child)::after { content: "→"; position: absolute; right: -23px; top: 50%; z-index: 2; transform: translateY(-50%); display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); font-size: 16px; font-weight: 900; }
+    .step-no { color: var(--ink); font-size: 12px; font-weight: 900; letter-spacing: .08em; }
+    .loop-step strong { display: block; margin: 12px 0 8px; color: var(--ink-strong); font-size: 18px; font-weight: 900; }
+    .loop-step p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .dimension-layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 24px; align-items: start; }
+    .dimension-list { position: sticky; top: 20px; display: grid; gap: 9px; align-content: start; }
+    .dimension-button {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 8px 12px;
+      color: var(--ink);
+      text-align: left;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+    .dimension-button:hover { transform: translateX(3px); border-color: var(--blue); }
+    .dimension-button[aria-pressed="true"] { color: white; background: var(--green); border-color: var(--green-dark); box-shadow: 0 4px 0 var(--green-dark); }
+    .dimension-number { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #f4f4f4; color: var(--muted); font-size: 12px; font-weight: 900; }
+    .dimension-button[aria-pressed="true"] .dimension-number { color: var(--green-dark); background: white; }
+    .dimension-button strong { font-size: 14px; font-weight: 900; line-height: 1.35; }
+    .dimension-detail { min-height: 616px; padding: 38px; border: 2px solid var(--line); border-radius: 22px; background: var(--paper); }
+    .detail-top { display: flex; align-items: center; gap: 12px; }
+    .detail-index { color: var(--green-dark); font-size: 13px; font-weight: 900; letter-spacing: .08em; }
+    .confidence { margin-left: auto; padding: 6px 11px; border: 2px solid var(--green); border-radius: 12px; background: var(--green-pale); color: var(--green-dark); font-size: 11px; font-weight: 900; }
+    .dimension-detail h3 { margin: 16px 0 10px; color: var(--ink-strong); font-size: clamp(31px, 4vw, 46px); line-height: 1.16; letter-spacing: -.035em; font-weight: 900; }
+    .detail-summary { max-width: 800px; margin: 0 0 34px; color: var(--muted); font-size: 18px; line-height: 1.55; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 30px; }
+    .detail-block { padding-top: 19px; border-top: 2px solid var(--line); }
+    .detail-block h4 { margin: 0 0 10px; color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+    .detail-block p { margin: 0; color: var(--ink); font-size: 15px; line-height: 1.65; }
+    .detail-block ul { margin: 0; padding-left: 20px; color: var(--ink); font-size: 15px; line-height: 1.65; }
+    .detail-block li::marker { color: var(--green); }
+    .detail-block li + li { margin-top: 8px; }
+    .takeaway { grid-column: 1 / -1; margin-top: 3px; padding: 19px 20px; border: 2px solid var(--green); border-radius: 16px; background: var(--green-pale); color: var(--ink); font-size: 15px; }
+    .takeaway strong { color: var(--green-dark); }
+    .reply-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .reply-table th, .reply-table td { padding: 16px 12px; border-bottom: 2px solid var(--line); text-align: left; }
+    .reply-table th { color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .04em; }
+    .reply-table td:first-child { color: var(--ink-strong); font-weight: 900; }
+    .reply-table tbody tr:last-child td { border-bottom: 0; }
+    .reply-table td:nth-child(n+2), .reply-table th:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+    .reply-table td:nth-child(2) { color: var(--green-dark); font-weight: 900; }
+    .reply-table td:nth-child(3) { color: var(--blue-dark); font-weight: 900; }
+    .boundary { margin-top: 112px; padding: 28px 30px; border: 2px solid var(--line); border-radius: 18px; background: #fafafa; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .boundary strong { color: var(--ink-strong); }
+    @media (max-width: 900px) {
+      .hero, .dimension-layout { grid-template-columns: 1fr; }
+      .hero { gap: 40px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .charts { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 1fr; }
+      .phase { min-height: 0; border-top: 0; border-left: 3px solid var(--line); padding: 4px 12px 30px 28px; }
+      .phase::before { left: -10px; top: 5px; }
+      .dimension-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dimension-list { position: static; }
+      .section-head { grid-template-columns: 1fr; gap: 14px; }
+    }
+    @media (max-width: 620px) {
+      body { font-size: 16px; }
+      .page { width: min(100% - 30px, 1200px); padding-bottom: 54px; }
+      .topbar { min-height: 66px; margin-bottom: 48px; }
+      .brand { font-size: 15px; }
+      .brand-mark { width: 30px; height: 30px; border-radius: 10px; }
+      .top-jump { min-height: 38px; padding: 0 11px; font-size: 10px; }
+      .hero { gap: 34px; }
+      .hero-copy::after { display: none; }
+      h1 { margin: 10px 0 16px; font-size: 35px; line-height: 1.12; }
+      .lead { font-size: 16px; }
+      .scope { padding: 22px; box-shadow: 0 5px 0 var(--green-soft); }
+      .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 52px; }
+      .stat { min-height: 158px; padding: 16px; }
+      .stat-label { min-height: 38px; font-size: 12px; }
+      .stat-value { font-size: 29px; }
+      .section { margin-top: 74px; }
+      .section-head { margin-bottom: 24px; }
+      .section h2 { font-size: 37px; }
+      .section-head p { font-size: 14px; }
+      .panel { padding: 20px 16px; border-radius: 17px; }
+      .panel-title { display: block; margin-bottom: 22px; }
+      .panel-title span { display: block; margin-top: 3px; }
+      .bar-row { grid-template-columns: 58px 1fr 55px; gap: 8px; font-size: 12px; }
+      .bar-track { height: 14px; }
+      .timeline { margin-top: 28px; padding-left: 8px; }
+      .loop { grid-template-columns: 1fr; gap: 20px; }
+      .loop-step { min-height: 0; padding: 21px; }
+      .loop-step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -26px; transform: translateX(-50%); }
+      .dimension-layout { gap: 18px; }
+      .dimension-list {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        width: calc(100% + 30px);
+        margin-left: -15px;
+        padding: 10px 15px 14px;
+        gap: 8px;
+        overflow-x: auto;
+        background: rgba(255, 255, 255, .96);
+        border-bottom: 2px solid var(--line);
+        scrollbar-width: none;
+      }
+      .dimension-list::-webkit-scrollbar { display: none; }
+      .dimension-button { flex: 0 0 auto; display: flex; width: auto; min-height: 44px; padding: 5px 10px 5px 6px; gap: 7px; border-radius: 12px; }
+      .dimension-button:hover { transform: none; }
+      .dimension-number { width: 30px; height: 30px; flex: 0 0 30px; }
+      .dimension-button strong { max-width: 128px; white-space: nowrap; font-size: 12px; }
+      .dimension-detail { min-height: 0; padding: 25px 19px; border-radius: 18px; }
+      .detail-top { align-items: flex-start; }
+      .confidence { margin-top: -2px; white-space: nowrap; }
+      .dimension-detail h3 { font-size: 32px; }
+      .detail-summary { margin-bottom: 26px; font-size: 16px; }
+      .detail-grid { grid-template-columns: 1fr; gap: 23px; }
+      .takeaway { grid-column: 1; }
+      .reply-table, .reply-table tbody, .reply-table tr, .reply-table td { display: block; width: 100%; }
+      .reply-table thead { display: none; }
+      .reply-table tr { padding: 16px 0; border-bottom: 2px solid var(--line); }
+      .reply-table tr:first-child { padding-top: 0; }
+      .reply-table tr:last-child { padding-bottom: 0; border-bottom: 0; }
+      .reply-table td, .reply-table td:nth-child(n+2) { display: grid; grid-template-columns: 108px 1fr; gap: 10px; padding: 5px 0; border: 0; text-align: left; }
+      .reply-table td::before { color: var(--faded); font-size: 11px; font-weight: 900; letter-spacing: .04em; }
+      .reply-table td:nth-child(1)::before { content: "邀请类型"; }
+      .reply-table td:nth-child(2)::before { content: "你发出"; }
+      .reply-table td:nth-child(3)::before { content: "她发出"; }
+      .reply-table td:nth-child(4)::before { content: "关系含义"; }
+      .boundary { margin-top: 74px; padding: 21px; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .page { width: 100%; padding: 0; }
+      .topbar { display: none; }
+      .dimension-layout { display: block; }
+      .dimension-list { display: none; }
+      .dimension-detail { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>RELATION LAB</span></div>
+      <a class="top-jump" href="#dimensions">查看十一维度 ↓</a>
+    </div>
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">WeFlow private-chat analysis</div>
+        <h1>我与杨杨616<br><span>十一维度关系分析</span></h1>
+        <p class="lead">从高度融合的朋友与工作共同体，到2025下半年的控制性疏离，再到2026年的结构性断裂。</p>
+      </div>
+      <aside class="scope" aria-label="分析范围">
+        <strong>分析范围</strong>
+        <p>2023-03-19 — 2026-08-17</p>
+        <p>278,436 条私聊 · 242,831 条文本</p>
+        <p>图片、语音、视频仅计数量，未识别内容</p>
+        <p class="excluded">仅保留十一维度；群聊未参与结论</p>
+      </aside>
+    </header>
+
+    <section class="stat-grid" aria-label="核心指标">
+      <article class="stat"><div class="stat-label">2025下半年消息降幅</div><div class="stat-value">−39.3%</div><div class="stat-note">活跃天数几乎不变，互动主动变浅</div></article>
+      <article class="stat"><div class="stat-label">2026沉默日</div><div class="stat-value">90天</div><div class="stat-note">截至8月17日，最长空窗约66天</div></article>
+      <article class="stat"><div class="stat-label">你的2026发言占比</div><div class="stat-value">38.9%</div><div class="stat-note">2025上半年为45.1%</div></article>
+      <article class="stat"><div class="stat-label">邀请回复率</div><div class="stat-value">89—98%</div><div class="stat-note">问题不是不回应，而是频道不匹配</div></article>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div><div class="eyebrow">Relationship shift</div><h2>关系强度的断点</h2></div>
+        <p>2025下半年仍几乎每天联系，但每个活跃日的互动深度下降约40%；2026才出现大规模沉默。</p>
+      </div>
+      <div class="charts">
+        <article class="panel">
+          <div class="panel-title"><strong>每个活跃日的消息量</strong><span>条／活跃日</span></div>
+          <div class="bars" aria-label="各阶段每个活跃日消息量">
+            <div class="bar-row"><span>2024</span><div class="bar-track"><div class="bar-fill" style="width:69.6%"></div></div><span class="bar-value">225.2</span></div>
+            <div class="bar-row"><span>2025上</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">323.6</span></div>
+            <div class="bar-row"><span>2025下</span><div class="bar-track"><div class="bar-fill secondary" style="width:60.3%"></div></div><span class="bar-value">195.2</span></div>
+            <div class="bar-row"><span>2026</span><div class="bar-track"><div class="bar-fill secondary" style="width:26.2%"></div></div><span class="bar-value">84.9</span></div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-title"><strong>活跃日覆盖率</strong><span>占阶段内全部日期</span></div>
+          <div class="bars" aria-label="各阶段活跃日覆盖率">
+            <div class="bar-row"><span>2024</span><div class="bar-track"><div class="bar-fill" style="width:98.6%"></div></div><span class="bar-value">98.6%</span></div>
+            <div class="bar-row"><span>2025上</span><div class="bar-track"><div class="bar-fill" style="width:97.8%"></div></div><span class="bar-value">97.8%</span></div>
+            <div class="bar-row"><span>2025下</span><div class="bar-track"><div class="bar-fill secondary" style="width:96.7%"></div></div><span class="bar-value">96.7%</span></div>
+            <div class="bar-row"><span>2026</span><div class="bar-track"><div class="bar-fill secondary" style="width:60.7%"></div></div><span class="bar-value">60.7%</span></div>
+          </div>
+        </article>
+      </div>
+      <div class="timeline" aria-label="关系阶段时间线">
+        <div class="phase"><div class="phase-year">2023</div><div class="phase-name">快速融合</div><p>朋友、工作、生存焦虑和日常陪伴迅速叠加。</p></div>
+        <div class="phase"><div class="phase-year">2024</div><div class="phase-name">稳定共同体</div><p>合作、分钱、生活费和情绪支持形成完整结构。</p></div>
+        <div class="phase"><div class="phase-year">2025上</div><div class="phase-name">高峰与过载</div><p>高产出、高在线、高摩擦，仍维持共同处理。</p></div>
+        <div class="phase"><div class="phase-year">2025下</div><div class="phase-name">控制性疏离</div><p>仍然每天联系，但减少共同承担和深度修复。</p></div>
+        <div class="phase"><div class="phase-year">2026</div><div class="phase-name">结构性断裂</div><p>大量沉默、低密度交流和明显不对称参与。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div><div class="eyebrow">Communication loop</div><h2>冲突如何自我强化</h2></div>
+        <p>双方都在自保，但靠近与退开的策略互相放大。</p>
+      </div>
+      <div class="loop" aria-label="追问退避循环">
+        <article class="loop-step"><span class="step-no">01</span><strong>外部压力进入</strong><p>客户、交付或收入带来不确定性。</p></article>
+        <article class="loop-step"><span class="step-no">02</span><strong>她靠近确认</strong><p>通过追问、同步和连续表达恢复控制感。</p></article>
+        <article class="loop-step"><span class="step-no">03</span><strong>你退开减压</strong><p>缩短回应、讲逻辑、独自处理或停止讨论。</p></article>
+        <article class="loop-step"><span class="step-no">04</span><strong>功能恢复，情绪延期</strong><p>继续工作和开玩笑，但没有完整修复。</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div><div class="eyebrow">Bid response</div><h2>高响应，但不总是对频道</h2></div>
+        <p>“你发出”指你表达邀请后她的回复；“她发出”反之。</p>
+      </div>
+      <div class="panel">
+        <table class="reply-table">
+          <thead><tr><th>邀请类型</th><th>你发出</th><th>她发出</th><th>关系含义</th></tr></thead>
+          <tbody>
+            <tr><td>直接问候／找人</td><td>88.9%</td><td>92.1%</td><td>双方都在维持可达性</td></tr>
+            <tr><td>负面情绪／脆弱</td><td>96.4%</td><td>93.2%</td><td>人会出现，但常切到方案频道</td></tr>
+            <tr><td>非工作生活分享</td><td>95.0%</td><td>91.5%</td><td>存在真实的朋友和生活底座</td></tr>
+            <tr><td>玩笑／吐槽</td><td>94.6%</td><td>93.2%</td><td>幽默是最稳定的亲密语言</td></tr>
+            <tr><td>征求意见</td><td>98.3%</td><td>96.5%</td><td>对彼此判断高度依赖</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="dimensions">
+      <div class="section-head">
+        <div><div class="eyebrow">Eleven lenses</div><h2>十一维度分析</h2></div>
+        <p>点击左侧维度查看证据、判断、风险和最小调整动作。</p>
+      </div>
+      <div class="dimension-layout">
+        <nav class="dimension-list" id="dimensionList" aria-label="十一维度选择"></nav>
+        <article class="dimension-detail" id="dimensionDetail" aria-live="polite"></article>
+      </div>
+    </section>
+
+    <footer class="boundary">
+      <strong>证据边界：</strong>文字已全量统计并核对关键语境；工作／非工作与情绪分类用于判断趋势，不等于逐条人工标注。图片、语音、视频内容未识别。群聊未纳入。情绪传染表示时间相关，不代表因果。
+    </footer>
+  </main>
+
+  <script>
+    const dimensions = [
+      {
+        n: 1, title: '去工作化关系测试', confidence: '高置信度',
+        summary: '不是纯工作关系，但共同工作是维持亲密频率的主要脚手架。',
+        evidence: ['2025上半年无工作日均44.5条，下半年36.4条，2026降到23.5条。','2026年没有任何一个无工作日超过100条；早期存在多个。'],
+        finding: '私人关系真实存在，却没有在工作去耦合后建立新的稳定载体。',
+        risk: '只减少项目、不重建朋友联系，关系会继续随工作一起退潮。',
+        action: '把纯生活联系与项目同步分开，朋友关系不能再依附“顺便聊工作”。'
+      },
+      {
+        n: 2, title: '关系阶段与转折点', confidence: '高置信度',
+        summary: '2025下半年是控制性疏离，2026才进入结构性断裂。',
+        evidence: ['2025上下半年活跃天数177与178，几乎相同；日消息深度却下降约40%。','2026出现90个沉默日，最长空窗约66天。'],
+        finding: '先是保持接触但减少共同承担，随后才变为大量不进入对话。',
+        risk: '把变化只解释为项目减少，会忽略项目减少本身也是避免冲突的策略。',
+        action: '讨论关系时按阶段复盘，不要把三年多的变化压缩成一次爆发。'
+      },
+      {
+        n: 3, title: '情绪劳动公平性', confidence: '中高置信度',
+        summary: '你承担更多降温与认错，她承担更多发起与连接维持。',
+        evidence: ['独立短句式道歉：你24次，她8次。','2025下半年6小时后重启会话：你68次，她124次。'],
+        finding: '双方付出的劳动类型不同，因而都容易觉得自己承担更多。',
+        risk: '你停止修复、她增加联系，会把失衡升级为追问—退避。',
+        action: '复盘时分别确认“谁在维持连接”和“谁在承担降温”，不要只数消息量。'
+      },
+      {
+        n: 4, title: '冲突修复质量', confidence: '中高置信度',
+        summary: '擅长恢复工作和玩笑，不擅长显性解决情绪与规则。',
+        evidence: ['识别到的2025下半年核心冲突全部重新出现工作和玩笑。','这些冲突没有完整的显性收尾，也没有道歉。'],
+        finding: '你们完成的是功能恢复，不是情绪修复。',
+        risk: '每次看似已经好了，实际只是把关系债务延期。',
+        action: '冲突后补三句：发生了什么、各自需要什么、下次改哪个动作。'
+      },
+      {
+        n: 5, title: '权力与资源结构', confidence: '中高置信度',
+        summary: '双核心分工让双方都有控制权，也都认为自己在兜底。',
+        evidence: ['她更常开启工作话题、追进度、处理商务与财务。','你在方案、执行、质量和具体判断上拥有更强方法权。'],
+        finding: '客户压力的协调权与实际执行的方法权没有明确边界。',
+        risk: '她把持续知情视为责任，你把持续追问视为干预。',
+        action: '一个任务一个负责人：主对接拥有排期权，主执行拥有方法权。'
+      },
+      {
+        n: 6, title: '回应邀请', confidence: '高置信度',
+        summary: '双方回复率极高，核心问题是回应经常换了频道。',
+        evidence: ['五类邀请的回复率均约89%—98%。','脆弱表达后，人通常会出现，但常直接分析原因或处理进度。'],
+        finding: '关系不是缺席型，而是高响应、低对频。',
+        risk: '长期“人在但没被接住”比单纯没回复更容易产生挫败。',
+        action: '先标记“只听／安慰／方案”三种模式，再开始回应。'
+      },
+      {
+        n: 7, title: '亲密需求与防御方式', confidence: '中高置信度',
+        summary: '她靠靠近获得安全，你靠拉开距离获得安全。',
+        evidence: ['她更常连续表达、重新发起和询问安排。','你在压力下更常压缩表达、独立处理和停止讨论。'],
+        finding: '双方的自保方式恰好互为对方的威胁信号。',
+        risk: '她越拉近，你越感到被控制；你越退开，她越感到关系失控。',
+        action: '暂停可以，但必须给出明确回来时间；追问可以，但一次只提一个信息请求。'
+      },
+      {
+        n: 8, title: '正向关系资产', confidence: '中高置信度',
+        summary: '幽默、行动型关心、快速回复和“我们”意识仍是主要保护因素。',
+        evidence: ['玩笑邀请回复率超过93%，共同幽默贯穿全部阶段。','明确感谢、直接赞美和成就庆祝很少。'],
+        finding: '你们用并肩做事和一起笑表达在乎，不擅长直接肯定。',
+        risk: '后期只留下低风险幽默，高风险的依赖与修复逐渐被撤回。',
+        action: '增加具体肯定：说清“你哪件事帮到了我”，不要只用玩笑代替。'
+      },
+      {
+        n: 9, title: '角色边界', confidence: '高置信度',
+        summary: '朋友、搭档、经济共同体、陪伴者和情绪出口长期混在一起。',
+        evidence: ['工作、生活费、睡眠饮食和情绪都在同一聊天流处理。','双方明确观察到“各做各的不吵，一起做容易吵”。'],
+        finding: '每句话发出时，双方不确定应以朋友还是项目角色回应。',
+        risk: '工作催促被听成关系不信任，暂停沟通被听成撤回关系。',
+        action: '使用【工作同步】【需要判断】【只想被听见】【朋友聊天】四种前缀。'
+      },
+      {
+        n: 10, title: '第三方关系生态', confidence: '中高置信度',
+        summary: '客户与合作方既制造“同一战线”，也把压力送进关系内部。',
+        evidence: ['2026剩余对话中，客户相关内容的相对占比继续上升。','伴侣、吃醋等词经语境核查多为玩笑或第三方，不构成浪漫排他证据。'],
+        finding: '第三方不是主要竞争者，而是共同体的燃料和污染源。',
+        risk: '共同项目减少后，共同敌人、共同胜利和自然联系理由也同时减少。',
+        action: '主对接先消化外部压力，只向内部传递明确事实、请求和截止点。'
+      },
+      {
+        n: 11, title: '情绪传染路径', confidence: '中等置信度',
+        summary: '后期负面情绪更容易激活对方压力，关系成为双向高敏感系统。',
+        evidence: ['早期负面回应相对基线约提升4倍。','2025下半年部分方向升至约6倍；2026约10—13倍但样本较小。'],
+        finding: '不是单向“她把焦虑传给你”，后期双方都会触发对方。',
+        risk: '一方表达压力时，另一方先启动防御，而不是稳定吸收。',
+        action: '负面情绪出现后先做30秒复述，再决定安慰、暂停还是处理方案。'
+      }
+    ];
+
+    const list = document.getElementById('dimensionList');
+    const detail = document.getElementById('dimensionDetail');
+
+    function renderDetail(item) {
+      detail.innerHTML = `
+        <div class="detail-top">
+          <span class="detail-index">DIMENSION ${String(item.n).padStart(2, '0')}</span>
+          <span class="confidence">${item.confidence}</span>
+        </div>
+        <h3>${item.title}</h3>
+        <p class="detail-summary">${item.summary}</p>
+        <div class="detail-grid">
+          <section class="detail-block"><h4>关键证据</h4><ul>${item.evidence.map(x => `<li>${x}</li>`).join('')}</ul></section>
+          <section class="detail-block"><h4>结构判断</h4><p>${item.finding}</p></section>
+          <section class="detail-block"><h4>主要风险</h4><p>${item.risk}</p></section>
+          <section class="detail-block"><h4>最小调整</h4><p>${item.action}</p></section>
+          <div class="takeaway"><strong>一句话：</strong>${item.summary}</div>
+        </div>`;
+    }
+
+    dimensions.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'dimension-button';
+      button.dataset.index = index;
+      button.setAttribute('aria-pressed', index === 0 ? 'true' : 'false');
+      button.innerHTML = `<span class="dimension-number">${String(item.n).padStart(2, '0')}</span><strong>${item.title}</strong>`;
+      button.addEventListener('click', () => {
+        list.querySelectorAll('button').forEach(node => node.setAttribute('aria-pressed', 'false'));
+        button.setAttribute('aria-pressed', 'true');
+        renderDetail(item);
+      });
+      list.appendChild(button);
+    });
+    renderDetail(dimensions[0]);
+  </script>
+</body>
+</html>
